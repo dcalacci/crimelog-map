@@ -82,12 +82,16 @@ class Polly(Crawler):
         if not self.links:
             self.links = []
         # regex for crime log pages
-        linkregex = re.compile("http://huntnewsnu.com/2013/([0-9]*)/crime-log-([a-z]*)-([0-9]*)-.*-([0-9]*)")
+        linkregex = re.compile("http://huntnewsnu.com/2013/([0-9]*)/crime-log-([a-z]*-[0-9]*)-([a-z]*-[0-9]*)")
         res = linkregex.search(link)
         if res:
             groups = res.groups()
-            link = (link, groups[0], groups[2], groups[3])
+            link = (link, groups[1], groups[2])
+            print link
             self.links.append(link)
+            with open("data.txt", 'a') as outfile:
+                txt = ', '.join(link)
+                outfile.write(txt + "\n")
             print "Link Added: ", link
 
     def visit(self, link, source=None):
