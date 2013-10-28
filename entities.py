@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import re, cPickle
+
 class Text:
     def __init__(self, sen=""):
         self.orig_text = sen
@@ -74,51 +74,3 @@ class Text:
     def parse_sentence_with_entities(self, entities):
         "initial call to __parse_entities"
         return self.__parse_entities(self.text, self.entities)
-
-
-from pattern.web import Crawler
-class Polly(Crawler): 
-    def add(self, link):
-        if not self.links:
-            self.links = []
-        # regex for crime log pages
-        linkregex = re.compile("http://huntnewsnu.com/2013/([0-9]*)/crime-log-([a-z]*-[0-9]*)-([a-z]*-[0-9]*)")
-        res = linkregex.search(link)
-        if res:
-            groups = res.groups()
-            link = (link, groups[1], groups[2])
-            print link
-            self.links.append(link)
-            with open("data.txt", 'a') as outfile:
-                txt = ', '.join(link)
-                outfile.write(txt + "\n")
-            print "Link Added: ", link
-
-    def visit(self, link, source=None):
-        self.links = []
-        print 'visited:', repr(link.url), 'from:', link.referrer
-        self.add(link.url)
-
-    def fail(self, link):
-        print 'failed:', repr(link.url)
-
-crimelogsurl = "http://huntnewsnu.com/category/crime-log/"
-
-p = Polly(links=[crimelogsurl], domains=["huntnewsnu.com"], delay=5)
-while not p.done:
-    p.crawl(method="DEPTH", cached=False, throttle=5)
-cPickle.dump(p.links, open('links.p', 'wb'))
-
-
-# def get_crimelogs():
-#     from pattern.web import Crawler
-
-#     crimelogsurl = "http://huntnewsnu.com/category/crime-log/"
-
-#     crawler = Crawler(links=[crimelogsurl], 
-#                       domains=['huntnewsnu.com'], 
-#                       delay=10.0, 
-#                       parser=HTMLLinkParser().parse)
-
-#     while not crawler.done:
-#         crawler.crawl(method=DEPTH)
